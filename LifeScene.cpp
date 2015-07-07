@@ -1,19 +1,21 @@
 #include "LifeScene.h"
 
+#include "Storage.h"
+
 #include <QtMath>
 
 #include <QtWidgets/QGraphicsRectItem>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
-const int CELL_SIZE = 10;
-
 LifeScene::LifeScene( QObject * parent ):
 	QGraphicsScene( parent )
 {
-	setSceneRect( 0, 0, GAME_FIELD.width() * CELL_SIZE, GAME_FIELD.height() * CELL_SIZE );
+	_gameField = theStorage.getFieldSize();
+	_cellSize = theStorage.getCellSize();
+	setSceneRect( 0, 0, _gameField.width() * _cellSize, _gameField.height() * _cellSize );
 
-	_currentStep = QVector<QVector<QGraphicsRectItem*> > ( GAME_FIELD.height(), QVector<QGraphicsRectItem*> ( GAME_FIELD.width(), nullptr ) );
-	_nextStep = QVector<QVector<bool> > ( GAME_FIELD.height(), QVector<bool> ( GAME_FIELD.width(), false ) );
+	_currentStep = QVector<QVector<QGraphicsRectItem*> > ( _gameField.height(), QVector<QGraphicsRectItem*> ( _gameField.width(), nullptr ) );
+	_nextStep = QVector<QVector<bool> > ( _gameField.height(), QVector<bool> ( _gameField.width(), false ) );
 }
 
 LifeScene::~LifeScene()
@@ -26,7 +28,7 @@ void LifeScene::locateCell( int x, int y )
 	if ( _currentStep[y][x] != nullptr )
 		return;
 
-	QGraphicsRectItem * cell = new QGraphicsRectItem( x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE );
+	QGraphicsRectItem * cell = new QGraphicsRectItem( x * _cellSize, y * _cellSize, _cellSize, _cellSize );
 	cell->setBrush( QBrush( Qt::green ) );
 	cell->setPen( QPen( Qt::green ) );
 
@@ -37,18 +39,18 @@ void LifeScene::locateCell( int x, int y )
 
 void LifeScene::updateWorld()
 {
-	_nextStep = QVector<QVector<bool> > ( GAME_FIELD.height(), QVector<bool> ( GAME_FIELD.width(), false ) );
+	_nextStep = QVector<QVector<bool> > ( _gameField.height(), QVector<bool> ( _gameField.width(), false ) );
 	int i, j;
-	for ( i = 0; i < GAME_FIELD.height(); ++i )
-		for ( j = 0; j < GAME_FIELD.width(); ++j ) {
+	for ( i = 0; i < _gameField.height(); ++i )
+		for ( j = 0; j < _gameField.width(); ++j ) {
 			if ( _currentStep[i][j] != nullptr )
 				_nextStep[i][j] = canLive( j, i );
 			else
 				_nextStep[i][j] = canBorn( j, i );
 		}
 
-	for ( i = 0; i < GAME_FIELD.height(); ++i )
-		for ( j = 0; j < GAME_FIELD.width(); ++j ) {
+	for ( i = 0; i < _gameField.height(); ++i )
+		for ( j = 0; j < _gameField.width(); ++j ) {
 			if ( _currentStep[i][j] != nullptr && !_nextStep[i][j] ) {
 				removeItem( _currentStep[i][j] );
 				delete _currentStep[i][j];
@@ -64,13 +66,13 @@ void LifeScene::updateWorld()
 
 bool LifeScene::canBorn( int x, int y )
 {
-	int left = x != 0 ?	( x - 1 ) % GAME_FIELD.width() : GAME_FIELD.width() - 1;
-	int top = y != 0 ? ( y - 1 ) % GAME_FIELD.height() : GAME_FIELD.height() - 1;
+	int left = x != 0 ?	( x - 1 ) % _gameField.width() : _gameField.width() - 1;
+	int top = y != 0 ? ( y - 1 ) % _gameField.height() : _gameField.height() - 1;
 
 	int count = 0;
 	for ( int i = 0; i < 3; ++i )
 		for ( int j = 0; j < 3; ++j ) {
-			if ( _currentStep[(top + i) % GAME_FIELD.height()][(left + j) % GAME_FIELD.width()] != nullptr )
+			if ( _currentStep[(top + i) % _gameField.height()][(left + j) % _gameField.width()] != nullptr )
 				count++;
 		}
 	return count == 3;
@@ -78,13 +80,13 @@ bool LifeScene::canBorn( int x, int y )
 
 bool LifeScene::canLive( int x, int y )
 {
-	int left = x != 0 ?	( x - 1 ) % GAME_FIELD.width() : GAME_FIELD.width() - 1;
-	int top = y != 0 ? ( y - 1 ) % GAME_FIELD.height() : GAME_FIELD.height() - 1;
+	int left = x != 0 ?	( x - 1 ) % _gameField.width() : _gameField.width() - 1;
+	int top = y != 0 ? ( y - 1 ) % _gameField.height() : _gameField.height() - 1;
 
 	int count = 0;
 	for ( int i = 0; i < 3; ++i )
 		for ( int j = 0; j < 3; ++j ) {
-			if ( _currentStep[(top + i) % GAME_FIELD.height()][(left + j) % GAME_FIELD.width()] != nullptr )
+			if ( _currentStep[(top + i) % _gameField.height()][(left + j) % _gameField.width()] != nullptr )
 				count++;
 		}
 	count--;
@@ -99,7 +101,7 @@ void LifeScene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	pos.setY( qFloor( p.y() ) );
 	pos.setX( pos.x() / 10 );
 	pos.setY( pos.y() / 10 );
-	if ( pos.x() < 0 || pos.x() >= GAME_FIELD.width() || pos.y() < 0 || pos.y() >= GAME_FIELD.height() )
+	if ( pos.x() < 0 || pos.x() >= _gameField.width() || pos.y() < 0 || pos.y() >= _gameField.height() )
 		return;
 
 	if ( _currentStep[pos.y()][pos.x()] == nullptr )

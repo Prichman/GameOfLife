@@ -2,8 +2,6 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-const QSize GAME_FIELD( 120, 80 );
-
 class QGraphicsRectItem;
 
 class LifeScene : public QGraphicsScene
@@ -26,6 +24,9 @@ protected:
 private:
 	QVector<QVector<QGraphicsRectItem*> > _currentStep;
 	QVector<QVector<bool> > _nextStep;
+
+	QSize	_gameField;
+	int		_cellSize;
 
 signals:
 	void stepDone();

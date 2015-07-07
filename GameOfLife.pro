@@ -16,7 +16,22 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         MainWindow.cpp \
-    LifeScene.cpp
+		LifeScene.cpp \
+    MenuLabel.cpp \
+    MenuItem.cpp \
+    HudManager.cpp \
+    Storage.cpp \
+    SettingsMenu.cpp
 
 HEADERS  += MainWindow.h \
-    LifeScene.h
+			LifeScene.h \
+    MenuLabel.h \
+    MenuItem.h \
+    HudManager.h \
+    Storage.h \
+    SettingsMenu.h
+
+win32:RC_ICONS += noname.ico
+
+RESOURCES += \
+    resources.qrc

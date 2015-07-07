@@ -11,7 +11,16 @@
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
-	resize( 1300, 820 );
+	resize( 400, 300 );
+}
+
+MainWindow::~MainWindow()
+{
+
+}
+
+void MainWindow::startNewGame()
+{
 	_gameTimer = new QTimer( this );
 
 	_gameScene = new LifeScene( this );
@@ -23,11 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
 	_gameTimer->setInterval( 500 );
 	connect( _gameTimer, &QTimer::timeout, _gameScene, &LifeScene::updateWorld );
 	connect( _gameScene, &LifeScene::stepDone, this, &MainWindow::updateGame );
-}
-
-MainWindow::~MainWindow()
-{
-
 }
 
 void MainWindow::updateGame()
@@ -56,6 +60,12 @@ void MainWindow::keyPressEvent( QKeyEvent * event )
 		{
 			if ( _gameTimer->interval() < 800 )
 				_gameTimer->setInterval( _gameTimer->interval() + 20 );
+			break;
+		}
+		case Qt::Key_Escape:
+		{
+			_gameTimer->stop();
+			emit needForMenu();
 			break;
 		}
 	}

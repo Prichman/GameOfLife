@@ -14,6 +14,7 @@ public:
 	MainWindow( QWidget * parent = 0 );
 	~MainWindow();
 
+	void startNewGame();
 	void updateGame();
 
 protected:
@@ -23,4 +24,7 @@ private:
 	LifeScene *			_gameScene;
 	QGraphicsView *		_gameView;
 	QTimer *			_gameTimer;
+
+signals:
+	void needForMenu();
 };
